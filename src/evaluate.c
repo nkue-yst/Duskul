@@ -1,6 +1,7 @@
 /* Duskul version 0.1.5,  2018.08.12,   Takeshi Ogihara, (C) 2018 */
 /* Duskul version 1.0.3,  2019.06.01 */
 #include <assert.h>
+#include <stdlib.h>
 #include "evaluate.h"
 #include "expression.h"
 #include "exp_imp.h"
@@ -117,13 +118,15 @@ void execInput(const argnode *agp, int count)
         varinfo vinfo = agp->p.vlist[i];
         int pos = vinfo.offset;
         long *target = vinfo.global ? &globals[pos] : &stack[localbase - pos];
-        for ( ; ; ) {
-            int n = fscanf(stdin, "%ld", target);
-            if (n == EOF)
-                abortMessageWithString("input eof", "input");
-            if (n >= 1)
-                break;
-            (void)getchar(); // skip a non-numeral char
-        }
+     
+        // 標準入力から文字列として読み取る
+        char str[100];
+        char *endptr;
+        
+        int n = fscanf(stdin, "%s", str);
+        if (n == EOF)
+            abortMessageWithString("input", "input");
+        
+        *target = strtol(str, &endptr, 0);
     }
 }
