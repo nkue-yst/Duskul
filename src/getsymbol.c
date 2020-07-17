@@ -55,10 +55,30 @@ long getnumber(int ch, TIN *tip)
 {
     long val = (long)(ch - '0');
     int d = nextch(tip);
-    while (chAttribute(d) == ca_digit) {
-        val = val * 10 + (long)(d - '0');
-        d = nextch(tip);
+
+    // 先頭に0xが来る(16進数字である)場合
+    if (ch == '0' && d == 'x') {
+        while (true) {
+            d = nextch(tip);
+            if (chAttribute(d) == ca_digit) {
+                val = val * 16 + (long)(d - '0');
+            }else if ('A' <= d && d <= 'F') {
+                val = val * 16 + (long)(d - 'A') + 10;
+            }else if ('a' <= d && d <= 'f') {
+                val = val * 16 + (long)(d - 'a') + 10;
+            }else {
+                break;
+            }
+        }
     }
+    // 10進数字の場合
+    else {
+        while (chAttribute(d) == ca_digit) {
+            val = val * 10 + (long)(d - '0');
+            d = nextch(tip);
+        }
+    }
+
     if (d != EOF) undoch(d, tip);
     return val;
 }
