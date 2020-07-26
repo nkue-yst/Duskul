@@ -119,35 +119,57 @@ void execInput(const argnode *agp, int count)
         int pos = vinfo.offset;
         long *target = vinfo.global ? &globals[pos] : &stack[localbase - pos];
      
-        char c = getchar();
-        char nc = getchar();
-        long val = (long)(c - '0');
+        char ch;
+        int is_negative = false;
+        long val = 0;
         
-        if (c == '0' && nc == 'x') {
-            while (true) {
-                nc = getchar();
-                if ('0' <= nc && nc <= '9') {
-                    val = val * 16 + (long)(nc - '0');
-                }else if ('A' <= nc && nc <= 'F') {
-                    val = val * 16 + (long)(nc - 'A') + 10;
-                }else if ('a' <= nc && nc <= 'f') {
-                    val = val * 16 + (long)(nc - 'a') + 10;
-                }else {
-                    break;
-                }
-            }
-        }else if ('0' <= c && c <= '9') {
-            val = val * 10 + (long)(nc - '0');
+        while (true) {
+            ch = getchar();
             
-            while (true) {
-                nc = getchar();
-                if ('0' <= nc && nc <= '9') {
-                    val = val * 10 + (long)(nc - '0');
-                }else {
+            if (ch == '-') {
+                is_negative = true;
+            }else if (ch == '0') {
+                ch = getchar();
+                if (ch == 'x') {
+                    while (true) {
+                        ch = getchar();
+                        if ('0' <= ch && ch <= '9')
+                            val = val * 16 + (long)(ch - '0');
+                        else if ('A' <= ch && ch <= 'F')
+                            val = val * 16 + (long)(ch - 'A') + 10;
+                        else if ('a' <= ch && ch <= 'f')
+                            val = val * 16 + (long)(ch - 'a') + 10;
+                        else
+                            break;
+                    }
+                    break;
+                }else if ('0' <= ch && ch <= '9') {
+                    val = (long)(ch - '0');
+                    while (true) {
+                        ch = getchar();
+                        if ('0' <= ch && ch <= '9')
+                            val = val * 10 + (long)(ch - '0');
+                        else
+                            break;
+                    }
                     break;
                 }
+            }else if ('1' <= ch && ch <= '9') {
+                val = (long)(ch - '0');
+                
+                while (true) {
+                    ch = getchar();
+                    if ('0' <= ch && ch <= '9')
+                        val = val * 10 + (long)(ch - '0');
+                    else
+                        break;
+                }
+                break;
             }
         }
+        
+        if (is_negative)
+            val *= -1;
         *target = val;
     }
 }
