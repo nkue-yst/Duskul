@@ -119,14 +119,35 @@ void execInput(const argnode *agp, int count)
         int pos = vinfo.offset;
         long *target = vinfo.global ? &globals[pos] : &stack[localbase - pos];
      
-        // 標準入力から文字列として読み取る
-        char str[100];
-        char *endptr;
+        char c = getchar();
+        char nc = getchar();
+        long val = (long)(c - '0');
         
-        int n = fscanf(stdin, "%s", str);
-        if (n == EOF)
-            abortMessageWithString("input", "input");
-        
-        *target = strtol(str, &endptr, 0);
+        if (c == '0' && nc == 'x') {
+            while (true) {
+                nc = getchar();
+                if ('0' <= nc && nc <= '9') {
+                    val = val * 16 + (long)(nc - '0');
+                }else if ('A' <= nc && nc <= 'F') {
+                    val = val * 16 + (long)(nc - 'A') + 10;
+                }else if ('a' <= nc && nc <= 'f') {
+                    val = val * 16 + (long)(nc - 'a') + 10;
+                }else {
+                    break;
+                }
+            }
+        }else if ('0' <= c && c <= '9') {
+            val = val * 10 + (long)(nc - '0');
+            
+            while (true) {
+                nc = getchar();
+                if ('0' <= nc && nc <= '9') {
+                    val = val * 10 + (long)(nc - '0');
+                }else {
+                    break;
+                }
+            }
+        }
+        *target = val;
     }
 }
